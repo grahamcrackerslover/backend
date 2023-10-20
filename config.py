@@ -1,0 +1,6 @@
+BOT_TOKEN = "6215189056:AAFP4tBjWnE2l-OGBBVR4D7DB5aJi8GdJCY"
+API_KEY = "n2xBMUgN_o1V0sZYOVkVhkd" \
+          "-4vK7XEBOtONciRqCYnTnzAn218AGlvgHKoA5oUeBeMHiWa6qQwEgC0MGcOAmWBF7zhEoHdd7PG1Z8yxYbIuONa1leXou6H_fxxbZE" \
+          "-5dvlt0uLjsiqqVx4c0Cg6oXG605b4n27o46-6rDjFrVaF67GVtpy1OHaeTiWIZoJ8kzsnSRvbtDnHxhGN8pgNV" \
+          "-bzNbDjkj0XSa16JsMGEfmylkujzb-3D6lyQuyMFFpw8CCiBfDrkuVI4_huKy5U2yLZ1QBZO8QGBS-BUU9J__Tw_zDbkJgRQXNNTgd6Ald" \
+          "-_ARZ4YVe_tVWqRSNAMWwSJA"
