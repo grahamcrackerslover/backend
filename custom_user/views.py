@@ -279,7 +279,19 @@ def vk_auth(request):
 
 
 @api_view(["GET"])
-def details(request, id):
+def details(request):
+    user_json = UserSerializer(request.user)
+
+    return success_response(
+        heading="",
+        message="",
+        data={"user": user_json.data},
+        code=status.HTTP_200_OK
+    )
+
+
+@api_view(["GET"])
+def details_by_id(request, id):
     if request.user and request.user.id == id:
         user_json = UserSerializer(request.user)
     else:
