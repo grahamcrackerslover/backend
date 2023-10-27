@@ -10,5 +10,6 @@ urlpatterns = [
     path("details/", views.details, name="custom-user-details"),  # /api/user/details
     path("inventory/<int:id>", views.inventory_by_id, name="custom-user-inventory-by-id"),  # /api/user/inventory/1
     path("inventory/", views.inventory, name="custom-user-inventory"),  # /api/user/inventory
+    path("stats/<int:id>", views.stats_by_id, name="custom-user-stats-by-id"),  # /api/user/stats
     path("stats/", views.stats, name="custom-user-stats"),  # /api/user/stats
 ]

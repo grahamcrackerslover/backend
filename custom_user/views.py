@@ -385,7 +385,7 @@ def stats(request):
 
 
 @api_view(["GET"])
-def stats(request, id):
+def stats_by_id(request, id):
     # Берем все предметы, полученные юзером
     try:
         user = CustomUser.objects.get(id=id)
