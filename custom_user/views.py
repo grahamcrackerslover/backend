@@ -370,8 +370,8 @@ def stats(request):
     # Фильтруем данные: сколько открыто кейсов, на какую сумму и сколько кристаллов выбито
     user_stats = {
         "cases_opened": cases_opened.count(),
-        "case_opened_mora": cases_opened.aggregate(total=Sum("price"))["total"],
-        "crystals_obtained": cases_opened.aggregate(total=Sum("crystals"))["total"],
+        "case_opened_mora": cases_opened.aggregate(total=Sum("item__price"))["total"],
+        "crystals_obtained": cases_opened.aggregate(total=Sum("item__crystals"))["total"],
     }
     user_stats["case_opened_mora"] = user_stats["case_opened_mora"] if user_stats["case_opened_mora"] else 0
     user_stats["crystals_obtained"] = user_stats["crystals_obtained"] if user_stats["crystals_obtained"] else 0
@@ -395,8 +395,8 @@ def stats_by_id(request, id):
     # Фильтруем данные: сколько открыто кейсов, на какую сумму и сколько кристаллов выбито
     user_stats = {
         "cases_opened": cases_opened.count(),
-        "case_opened_mora": cases_opened.aggregate(total=Sum("price"))["total"],
-        "crystals_obtained": cases_opened.aggregate(total=Sum("crystals"))["total"],
+        "case_opened_mora": cases_opened.aggregate(total=Sum("item__price"))["total"],
+        "crystals_obtained": cases_opened.aggregate(total=Sum("item__crystals"))["total"],
     }
     user_stats["case_opened_mora"] = user_stats["case_opened_mora"] if user_stats["case_opened_mora"] else 0
     user_stats["crystals_obtained"] = user_stats["crystals_obtained"] if user_stats["crystals_obtained"] else 0
