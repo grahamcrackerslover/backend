@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import BonusCode, Code
+from .models import BonusCode, Code, PromoCode
 from history.models import HistoryItem as HItem
 from cases.models import Item
 
@@ -16,3 +16,4 @@ class BonusCodeAdmin(admin.ModelAdmin):
 
 # admin.site.register(Code)
 admin.site.register(BonusCode, BonusCodeAdmin)
+admin.register(PromoCode)
