@@ -169,10 +169,7 @@ def shop_buy(request):
         )
 
     new_hitem = HItem.objects.create(
-        name=item.name,
-        type=item.type,
-        crystals=item.crystals,
-        price=item.price,
+        item=item,
         owner=request.user if request.user.is_authenticated else None,
         is_ordered=True,
         from_shop=True,
