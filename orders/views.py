@@ -98,6 +98,9 @@ def cancel_order(request):
     order.is_cancelled = True
     order.save()
 
+    order.item.is_ordered = False
+    order.item.save()
+
     return success_response(
         heading="Заказ отменен",
         message=f"Вы успешно отменили заказ на \"{order.item.item.name}\"",
