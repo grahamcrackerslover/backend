@@ -279,6 +279,7 @@ def vk_auth(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def details(request):
     user_json = UserSerializer(request.user)
 
@@ -306,7 +307,21 @@ def details_by_id(request, id):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def inventory(request, id):
+def inventory(request):
+    # Фильтруем выпавшие предметы (у них своя модель) по юзеру
+    items = HItem.objects.filter(owner=request.user)
+    serialized_items = HItemSerializer(items, many=True)
+
+    return success_response(
+        heading="",
+        message="",
+        data={"items": serialized_items},
+        code=status.HTTP_200_OK
+    )
+
+
+@api_view(["GET"])
+def inventory_by_id(request, id):
     # Фильтруем выпавшие предметы (у них своя модель) по юзеру
     items = HItem.objects.filter(owner=CustomUser.objects.get(id=id))
     serialized_items = HItemSerializer(items, many=True)
