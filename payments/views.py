@@ -61,7 +61,7 @@ def verify_promo(request, code):
             heading="",
             message="",
             data={
-                "multiplier": exists.percentage
+                "multiplier": promo.percentage
             },
             code=status.HTTP_200_OK
         )
