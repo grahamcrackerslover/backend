@@ -4,6 +4,7 @@ import hmac
 import time
 
 import requests
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
 from django.utils import timezone
 from django.utils.crypto import constant_time_compare
@@ -293,10 +294,14 @@ def details(request):
 
 @api_view(["GET"])
 def details_by_id(request, id):
+    try:
+        user = CustomUser.objects.get(id=id)
+    except CustomUser.DoesNotExist:
+        raise ObjectDoesNotExist()
     if request.user and request.user.id == id:
         user_json = UserSerializer(request.user)
     else:
-        user_json = BasicUserSerializer(CustomUser.objects.get(id=id))
+        user_json = BasicUserSerializer(user)
     return success_response(
         heading="",
         message="",
@@ -323,7 +328,11 @@ def inventory(request):
 @api_view(["GET"])
 def inventory_by_id(request, id):
     # Фильтруем выпавшие предметы (у них своя модель) по юзеру
-    items = HItem.objects.filter(owner=CustomUser.objects.get(id=id))
+    try:
+        user = CustomUser.objects.get(id=id)
+    except CustomUser.DoesNotExist:
+        raise ObjectDoesNotExist()
+    items = HItem.objects.filter(owner=user)
     serialized_items = HItemSerializer(items, many=True)
 
     return success_response(
@@ -358,6 +367,31 @@ def set_uid(request):
 def stats(request):
     # Берем все предметы, полученные юзером
     cases_opened = HItem.objects.filter(owner=request.user)
+    # Фильтруем данные: сколько открыто кейсов, на какую сумму и сколько кристаллов выбито
+    user_stats = {
+        "cases_opened": cases_opened.count(),
+        "case_opened_mora": cases_opened.aggregate(total=Sum("price"))["total"],
+        "crystals_obtained": cases_opened.aggregate(total=Sum("crystals"))["total"],
+    }
+    user_stats["case_opened_mora"] = user_stats["case_opened_mora"] if user_stats["case_opened_mora"] else 0
+    user_stats["crystals_obtained"] = user_stats["crystals_obtained"] if user_stats["crystals_obtained"] else 0
+
+    return success_response(
+        heading="",
+        message="",
+        data={"stats": user_stats},
+        code=status.HTTP_200_OK
+    )
+
+
+@api_view(["GET"])
+def stats(request, id):
+    # Берем все предметы, полученные юзером
+    try:
+        user = CustomUser.objects.get(id=id)
+    except CustomUser.DoesNotExist:
+        raise ObjectDoesNotExist()
+    cases_opened = HItem.objects.filter(owner=user)
     # Фильтруем данные: сколько открыто кейсов, на какую сумму и сколько кристаллов выбито
     user_stats = {
         "cases_opened": cases_opened.count(),
