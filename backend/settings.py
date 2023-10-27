@@ -29,6 +29,8 @@ ALLOWED_HOSTS = ["*"]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 
+CSRF_TRUSTED_ORIGINS = ['api.kleewish.hoolisoftware.xyz']
+
 # Application definition
 
 REST_FRAMEWORK = {

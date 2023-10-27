@@ -292,6 +292,25 @@ def details(request):
 
 
 @api_view(["GET"])
+def basic_details(request):
+    user_id = request.data['user_id']
+    try:
+        user = CustomUser.objects.get(id=user_id)
+    except CustomUser.DoesNotExist:
+        return error_response(
+            heading="Ошибка",
+            message="Пользователь не существует",
+            errors=["user_not_exists"]
+        )
+    return success_response(
+        heading="",
+        message="",
+        data={"user": serialized_data},
+        code=status.HTTP_200_OK
+    )
+
+
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def inventory(request):
     # Фильтруем выпавшие предметы (у них своя модель) по юзеру
