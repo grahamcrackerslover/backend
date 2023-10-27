@@ -23,7 +23,7 @@ from history.models import HistoryItem as HItem
 from history.serializers import HistoryItemSerializer as HItemSerializer
 from misc.responses import error_response, success_response
 from .models import CustomUser
-from .serializers import UserSerializer
+from .serializers import UserSerializer, BasicUserSerializer
 
 
 def merge_accounts(first: CustomUser, second: CustomUser):
@@ -234,7 +234,7 @@ def vk_auth(request):
         )
     data = req.json()
     if (
-        "response" not in data
+            "response" not in data
     ):  # Если в дате нет поля респонс (такое бывает, даже если запрос прошел)
         return error_response(
             heading="Ошибка",
@@ -279,33 +279,17 @@ def vk_auth(request):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
 def details(request):
     # Получаем данные юзера
-    user_json = UserSerializer(request.user)
+    user_id = request.data["user_id"]
+    if request.user and request.user.id == user_id:
+        user_json = UserSerializer(request.user)
+    else:
+        user_json = BasicUserSerializer(CustomUser.objects.get(id=user_id))
     return success_response(
         heading="",
         message="",
         data={"user": user_json.data},
-        code=status.HTTP_200_OK
-    )
-
-
-@api_view(["GET"])
-def basic_details(request):
-    user_id = request.data['user_id']
-    try:
-        user = CustomUser.objects.get(id=user_id)
-    except CustomUser.DoesNotExist:
-        return error_response(
-            heading="Ошибка",
-            message="Пользователь не существует",
-            errors=["user_not_exists"]
-        )
-    return success_response(
-        heading="",
-        message="",
-        data={"user": serialized_data},
         code=status.HTTP_200_OK
     )
 
