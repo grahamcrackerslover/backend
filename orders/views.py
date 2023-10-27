@@ -12,7 +12,7 @@ from .models import Orders
 
 def place_order(item, genshin_uid, is_test_instance):
     # Если ордер на этот предмет уже существует, возвращаем ошибку
-    if Orders.objects.filter(item=item).exists():
+    if Orders.objects.filter(item=item, is_cancelled=False).exists():
         return error_response(
             heading="Предмет уже заказан",
             message="К сожалению, Вы не можете повторно разместить заказ на вывод предмета, который уже заказан",
