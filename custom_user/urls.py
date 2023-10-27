@@ -11,6 +11,7 @@ urlpatterns = [
         "auth/vk_login/", views.vk_auth, name="custom-user-vk-auth"
     ),  # /api/user/auth/vk_login
     path("details/", views.details, name="custom-user-details"),  # /api/user/details
+    path("details/<int:id>", views.details, name="custom-user-basic-details"),  # /api/user/details/1
     path(
         "inventory/", views.inventory, name="custom-user-inventory"
     ),  # /api/user/inventory

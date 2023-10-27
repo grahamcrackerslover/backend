@@ -279,13 +279,11 @@ def vk_auth(request):
 
 
 @api_view(["GET"])
-def details(request):
-    # Получаем данные юзера
-    user_id = request.data["user_id"]
-    if request.user and request.user.id == user_id:
+def details(request, id):
+    if request.user and request.user.id == id:
         user_json = UserSerializer(request.user)
     else:
-        user_json = BasicUserSerializer(CustomUser.objects.get(id=user_id))
+        user_json = BasicUserSerializer(CustomUser.objects.get(id=id))
     return success_response(
         heading="",
         message="",
