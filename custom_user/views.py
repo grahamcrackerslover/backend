@@ -294,9 +294,9 @@ def details(request, id):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def inventory(request):
+def inventory(request, id):
     # Фильтруем выпавшие предметы (у них своя модель) по юзеру
-    items = HItem.objects.filter(owner=request.user)
+    items = HItem.objects.filter(owner=CustomUser.objects.get(id=id))
     serialized_items = HItemSerializer(items, many=True)
 
     return success_response(
