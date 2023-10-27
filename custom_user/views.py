@@ -320,7 +320,7 @@ def inventory(request):
     return success_response(
         heading="",
         message="",
-        data={"items": serialized_items},
+        data={"items": serialized_items.data},
         code=status.HTTP_200_OK
     )
 
@@ -338,7 +338,7 @@ def inventory_by_id(request, id):
     return success_response(
         heading="",
         message="",
-        data={"items": serialized_items},
+        data={"items": serialized_items.data},
         code=status.HTTP_200_OK
     )
 
