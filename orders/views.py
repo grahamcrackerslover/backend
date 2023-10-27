@@ -74,7 +74,7 @@ def cancel_order(request):
     order_id = request.data["id"]
 
     # Получаем ордер, принадлежащий пользователю
-    order = Orders.objects.filter(id=order_id, item__owner=request.user).first()
+    order = Orders.objects.filter(id=order_id, item__owner=request.user, is_cancelled=False).first()
     if not order:
         return error_response(
             heading="Заказ не существует",
