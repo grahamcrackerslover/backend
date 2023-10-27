@@ -16,4 +16,4 @@ class BonusCodeAdmin(admin.ModelAdmin):
 
 # admin.site.register(Code)
 admin.site.register(BonusCode, BonusCodeAdmin)
-admin.register(PromoCode)
+admin.site.register(PromoCode)
