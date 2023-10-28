@@ -15,6 +15,7 @@ class Item(models.Model):
     crystals = models.BigIntegerField()
     price = models.IntegerField()
     sgd_price = models.IntegerField(default=0)
+    for_sale = models.BooleanField(default=True)
     cashback = models.IntegerField(null=True)
 
     def __str__(self):
