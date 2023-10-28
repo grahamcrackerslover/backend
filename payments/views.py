@@ -34,7 +34,7 @@ def activate_bonus(user, bonus_code):
 
 
 class ShopItemViewSet(ModelViewSet):
-    serializer_class = ItemSerializer()
+    serializer_class = ItemSerializer
 
     def get_queryset(self):
         return Item.objects.filter(for_sale=True)

@@ -105,7 +105,7 @@ DATABASES = {
         'NAME': 'backend_db',
         'USER': 'root',
         'PASSWORD': 'root',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '3306',
     }
 }

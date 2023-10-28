@@ -5,7 +5,7 @@ from . import views
 from .views import ShopItemViewSet
 
 router = SimpleRouter()
-router.register(r'items/', ShopItemViewSet, basename='payments-items')
+router.register(r'items', ShopItemViewSet, basename='payments-items')
 
 urlpatterns = [
     path('', include(router.urls)),
