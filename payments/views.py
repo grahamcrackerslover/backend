@@ -5,8 +5,10 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.viewsets import ModelViewSet
 
 from cases.models import Item
+from cases.serializers import ItemSerializer
 from history.models import HistoryItem as HItem
 from misc.responses import success_response, error_response
 from orders.views import place_order
@@ -29,6 +31,13 @@ def activate_bonus(user, bonus_code):
         errors=["invalid_bonus_code"],
         code=status.HTTP_400_BAD_REQUEST
     )
+
+
+class ShopItemViewSet(ModelViewSet):
+    serializer_class = ItemSerializer()
+
+    def get_queryset(self):
+        return Item.objects.filter(for_sale=True)
 
 
 @api_view(["GET"])
