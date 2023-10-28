@@ -9,6 +9,7 @@ from custom_user.models import CustomUser
 
 class Item(models.Model):
     name = models.CharField(max_length=255)
+    description = models.TextField(null=True)
     photo_url = models.ImageField(upload_to="items/")
     TYPE_CHOICES = [("crystal", "Crystal"), ("moon", "Moon"), ("money", "Money")]
     type = models.CharField(choices=TYPE_CHOICES, max_length=10)

@@ -33,11 +33,43 @@ def activate_bonus(user, bonus_code):
     )
 
 
-class ShopItemViewSet(ModelViewSet):
-    serializer_class = ItemSerializer
+# class ShopItemViewSet(ModelViewSet):
+#     serializer_class = ItemSerializer
+#
+#     def get_queryset(self):
+#         return Item.objects.filter(for_sale=True)
 
-    def get_queryset(self):
-        return Item.objects.filter(for_sale=True)
+
+@api_view(["GET"])
+def list_all_items(request):
+    items = Item.objects.filter(for_sale=True)
+    serialized = ItemSerializer(items, many=True)
+
+    return success_response(
+        heading="",
+        message="",
+        data={
+            "items": serialized.data
+        }
+    )
+
+
+@api_view(["GET"])
+def item_details(request, id):
+    try:
+        return success_response(
+            heading="",
+            message="",
+            data={
+                "items": ItemSerializer(Item.objects.get(id=id)).data
+            }
+        )
+    except Item.DoesNotExist:
+        return error_response(
+            heading="Предмета не существует...",
+            message="Запрашиваемый предмет не существует. Если вы считаете, что это ошибка, обратитесь в поддержку.",
+            errors=["item_not_exist"]
+        )
 
 
 @api_view(["GET"])
