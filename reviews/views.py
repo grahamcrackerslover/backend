@@ -65,6 +65,8 @@ def list_reviews(request):
     end = start + page_size
 
     queryset = Review.objects.order_by('-created_at')[start:end]
+    # Проверить есть ли отзывы на следующей странице
+    has_next = Review.objects.order_by('-created_at')[end:end + page_size].exists()
 
     # Проверяем есть ли отзывы (надо будет заменить на какой-то код, чтобы
     # фронтенд понимал, есть ли еще отзывы и убирал кнопку
@@ -73,7 +75,7 @@ def list_reviews(request):
             heading="Отзывы кончились",
             message=f"Вы дочитали до конца отзывов, их не осталось. Вопрос - зачем?",
             errors=["invalid_review"],
-            # code=status.HTTP_204_NO_CONTENT
+            code=status.HTTP_200_OK
         )
 
     serializer = ReviewSerializer(queryset, many=True)
@@ -81,7 +83,7 @@ def list_reviews(request):
     return success_response(
         heading="",
         message="",
-        data={"reviews": serializer.data, "page": page_number},
+        data={"reviews": serializer.data, "page": page_number, "has_next": has_next},
         code=status.HTTP_200_OK
     )
 
