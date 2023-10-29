@@ -9,4 +9,4 @@ class OrdersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Orders
-        exclude = ("is_test_instance",)
+        exclude = ("is_test_instance", "is_in_queue", "is_allowed")

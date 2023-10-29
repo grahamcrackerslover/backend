@@ -81,7 +81,7 @@ def list_reviews(request):
     return success_response(
         heading="",
         message="",
-        data={"reviews": serializer.data},
+        data={"reviews": serializer.data, "page": page_number},
         code=status.HTTP_200_OK
     )
 
