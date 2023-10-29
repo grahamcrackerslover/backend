@@ -64,6 +64,7 @@ def list_reviews(request):
     start = (page_number - 1) * page_size
     end = start + page_size
 
+    count = Review.objects.count()
     queryset = Review.objects.order_by('-created_at')[start:end]
     # Проверить есть ли отзывы на следующей странице
     has_next = Review.objects.order_by('-created_at')[end:end + page_size].exists()
@@ -83,7 +84,7 @@ def list_reviews(request):
     return success_response(
         heading="",
         message="",
-        data={"reviews": serializer.data, "page": page_number, "has_next": has_next},
+        data={"reviews": serializer.data, "page": page_number, "has_next": has_next, "count": count},
         code=status.HTTP_200_OK
     )
 
