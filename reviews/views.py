@@ -44,7 +44,7 @@ def users_review(request):
         heading="",
         message="",
         data={
-            "review": ReviewSerializer(review, many=True)
+            "review": ReviewSerializer(review, many=True).data
         }
     )
 
