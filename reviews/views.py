@@ -53,7 +53,7 @@ def list_reviews(request):
             heading="Отзывы кончились",
             message=f"Вы дочитали до конца отзывов, их не осталось. Вопрос - зачем?",
             errors=["invalid_review"],
-            code=status.HTTP_204_NO_CONTENT
+            # code=status.HTTP_204_NO_CONTENT
         )
 
     serializer = ReviewSerializer(queryset, many=True)
