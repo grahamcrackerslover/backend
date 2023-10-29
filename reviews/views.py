@@ -52,7 +52,7 @@ def users_review(request):
         heading="",
         message="",
         data={
-            "review": ReviewSerializer(review, many=True).data
+            "review": ReviewSerializer(review).data
         }
     )
 
@@ -83,4 +83,20 @@ def list_reviews(request):
         message="",
         data={"reviews": serializer.data},
         code=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+def reviews_stats(request):
+    # Get the count of positive and negative reviews
+    positive_reviews = Review.objects.filter(is_positive=True).count()
+    negative_reviews = Review.objects.filter(is_positive=False).count()
+
+    return success_response(
+        heading="",
+        message="",
+        data={
+            "positive_reviews": positive_reviews,
+            "negative_reviews": negative_reviews
+        }
     )
