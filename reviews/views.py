@@ -19,6 +19,14 @@ def create_review(request):
     serializer = ReviewSerializer(data=data)
 
     if serializer.is_valid():
+        # Проверить, оставлял ли юзер уже отзыв
+        if Review.objects.filter(author=request.user).exists():
+            return error_response(
+                heading="Отзыв уже оставлен",
+                message=f"Кажется, Вы уже оставляли отзыв. Если Вы считаете, что это ошибка, обратитесь в поддержку",
+                errors=["review_already_left"],
+                code=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save(author=request.user)
         return success_response(
             heading="Отзыв оставлен",
