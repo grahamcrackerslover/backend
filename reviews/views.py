@@ -37,6 +37,18 @@ def create_review(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def users_review(request):
+    review = Review.objects.filter(author=request.user)
+    return success_response(
+        heading="",
+        message="",
+        data={
+            "review": ReviewSerializer(review, many=True)
+        }
+    )
+
+@api_view(['GET'])
 def list_reviews(request):
     # Запрос будет отправляться в формате /api/reviews/?page=x
     page_number = int(request.query_params.get('page', 1))
