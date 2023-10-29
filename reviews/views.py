@@ -60,7 +60,7 @@ def users_review(request):
 def list_reviews(request):
     # Запрос будет отправляться в формате /api/reviews/?page=x
     page_number = int(request.query_params.get('page', 1))
-    page_size = 10
+    page_size = 2
     start = (page_number - 1) * page_size
     end = start + page_size
 
