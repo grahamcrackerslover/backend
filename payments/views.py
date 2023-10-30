@@ -61,7 +61,7 @@ def item_details(request, id):
             heading="",
             message="",
             data={
-                "items": ItemSerializer(Item.objects.get(id=id)).data
+                "item": ItemSerializer(Item.objects.get(id=id)).data
             }
         )
     except Item.DoesNotExist:

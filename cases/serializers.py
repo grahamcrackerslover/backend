@@ -6,7 +6,7 @@ from .models import Item, Case
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ("name", "description", "price", "for_sale", "photo_url")
+        fields = ("id", "name", "description", "price", "for_sale", "photo_url")
 
     def create(self, validated_data):
         item = Item.objects.create(
