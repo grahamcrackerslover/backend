@@ -47,7 +47,7 @@ def create_review(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def users_review(request):
-    review = Review.objects.filter(author=request.user)
+    review = Review.objects.filter(author=request.user).first()
     return success_response(
         heading="",
         message="",
