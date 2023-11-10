@@ -17,7 +17,7 @@ from rest_framework.decorators import (
 from rest_framework.exceptions import NotAuthenticated, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from config import BOT_TOKEN
+from config import BOT_TOKEN, DEV_BOT_TOKEN
 from giveaways.models import Giveaway, GiveawayItem, LotteryTicket
 from history.models import HistoryCase as HCase
 from history.models import HistoryItem as HItem
@@ -71,7 +71,7 @@ def merge_accounts(first: CustomUser, second: CustomUser):
     first.save()
 
 
-def checkTelegramAuthorization(tg_user):
+def checkTelegramAuthorization(tg_user, dev):
     # Подтверждение данных путем сравнения хэшированной строки из всех отсортированных
     # полей (кроме поля хэша) и самого хэша
     check_hash = tg_user["hash"]
@@ -81,7 +81,11 @@ def checkTelegramAuthorization(tg_user):
     data_check_arr.sort()
     data_check_string = "\n".join(data_check_arr)
 
-    secret_key = hashlib.sha256(BOT_TOKEN.encode("utf-8")).digest()
+    if not dev:
+        secret_key = hashlib.sha256(BOT_TOKEN.encode("utf-8")).digest()
+    else:
+        secret_key = hashlib.sha256(DEV_BOT_TOKEN.encode("utf-8")).digest()
+
     hash = hmac.new(
         secret_key, msg=data_check_string.encode("utf-8"), digestmod=hashlib.sha256
     ).hexdigest()
@@ -96,6 +100,7 @@ def checkTelegramAuthorization(tg_user):
 @permission_classes([AllowAny])
 @csrf_exempt
 def telegram_auth(request):
+    dev = bool(request.query_params.get('dev', 0))
     # Если уже аутентифицирован (в хедерах есть квт)
     if isinstance(request.user, CustomUser):
         # Если оба аккаунта привязаны
@@ -136,7 +141,7 @@ def telegram_auth(request):
     referrer = request.data.get("referrer")  # Если передан реферер
 
     # Если есть данные и они верны
-    if data and checkTelegramAuthorization(data):
+    if data and checkTelegramAuthorization(data, dev):
         # Взять или создать аккаунт с таким айди
         user, created = CustomUser.objects.get_or_create(
             telegram_id=data["id"],
