@@ -18,4 +18,4 @@ class UserStatsSerializer(serializers.Serializer):
 class BasicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ("first_name", "last_name", "photo_url")
+        fields = ("id", "first_name", "last_name", "photo_url")

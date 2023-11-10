@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import (
     api_view,
@@ -42,59 +43,69 @@ def user_history(request):
 
 
 @api_view(["POST"])
-def sell_item(request):
-    # Получаем ID предмета
-    item_id = request.data["id"]
-    # Ищем предмет с указанным ID, принадлежащий пользователю
-    item = HistoryItem.objects.filter(id=item_id, owner=request.user).first()
+def sell_items(request):
+    # Получаем список ID предметов
+    item_ids = request.data["ids"]  # This should be a list of item IDs.
 
-    # Если предмет найден
-    if item:
-        # Если предмет куплен в магазине, его нельзя продать
-        if item.from_shop:
-            return error_response(
-                heading="Предмет из магазина",
-                message="К сожалению, Вы не можете продать предмет, который был куплен в магазине",
-                errors=["sell_item_from_shop"],
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        # Если предмет уже продан
-        elif item.is_sold:
-            return error_response(
-                heading="Предмет уже продан",
-                message="К сожалению, Вы не можете продать предмет, который уже был продан. Если Вы считаете, что это "
-                        "ошибка, обратитесь к поддержку",
-                errors=["item_already_sold"],
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        # Если на предмет уже создан заказ
-        elif Orders.objects.filter(item=item).exists():
-            return error_response(
-                heading="Предмет заказан",
-                message="К сожалению, Вы не можете продать предмет, который уже заказан. Для начала отмените заказ",
-                errors=["sell_ordered_item"],
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        # Если все условия выполнены
-        else:
-            # Устанавливаем атрибут is_sold у предмета в True, чтобы не удалять его из БД
-            # и добавляем сумму продажи предмета на баланс пользователя
+    # Проверка, что item_ids является списком
+    if not isinstance(item_ids, list):
+        return error_response(
+            heading="Неверный формат данных",
+            message="Должен быть предоставлен список ID предметов.",
+            errors=["not_a_list"],
+            code=status.HTTP_400_BAD_REQUEST
+        )
+
+    sold_items = []
+    total_price = 0
+    errors = []
+
+    with transaction.atomic():
+        for item_id in item_ids:
+            item = HistoryItem.objects.filter(id=item_id, owner=request.user).first()
+
+            if not item:
+                errors.append({"id": item_id, "error": "Item not found or not owned by user"})
+                continue
+
+            if item.from_shop:
+                errors.append({"id": item_id, "error": "Item from shop cannot be sold"})
+                continue
+
+            if item.is_sold:
+                errors.append({"id": item_id, "error": "Item is already sold"})
+                continue
+
+            if Orders.objects.filter(item=item).exists():
+                errors.append({"id": item_id, "error": "Item is ordered and cannot be sold"})
+                continue
+
+            # Продажа предмета
             item.is_sold = True
-            request.user.balance += item.item.price
+            total_price += item.item.price
+            sold_items.append(item)
+
+        # Если есть предметы для продажи
+        if sold_items:
+            # Обновляем баланс пользователя и сохраняем изменения для каждого предмета
+            request.user.balance += total_price
             request.user.save()
-            item.save()
-            return success_response(
-                heading="Предмет продан",
-                message=f"Получено {item.item.price} моры",
-                data={},
-                code=status.HTTP_200_OK
+            for item in sold_items:
+                item.save()
+
+        # Если есть ошибки, возвращаем их
+        if errors:
+            return error_response(
+                heading="Ошибка при продаже предметов",
+                message="Некоторые предметы не могут быть проданы.",
+                errors=errors,
+                code=status.HTTP_400_BAD_REQUEST
             )
 
-    # Если предмет не найден
-    return error_response(
-        heading="Предмет не существует",
-        message="К сожалению, этот предмет не существует, или Вы не его владелец. Если Вы считаете, что это "
-                "ошибка, обратитесь к поддержку",
-        errors=["item_not_exists"],
-        code=status.HTTP_400_BAD_REQUEST
-    )
+        # Если все предметы проданы успешно
+        return success_response(
+            heading="Предметы проданы",
+            message=f"Получено {total_price} моры за продажу предметов.",
+            data={"sold_items": [item.id for item in sold_items], "total_price": total_price},
+            code=status.HTTP_200_OK
+        )

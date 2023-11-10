@@ -14,7 +14,7 @@ from rest_framework.decorators import (
     api_view,
     permission_classes,
 )
-from rest_framework.exceptions import NotAuthenticated
+from rest_framework.exceptions import NotAuthenticated, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from config import BOT_TOKEN
@@ -345,21 +345,58 @@ def inventory_by_id(request, id):
 
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
-def set_uid(request):
-    # Устанавливаем юид как дефолтный для юзера
-    # TODO: добавить обработчик ошибок, для таких случаев как неверный формат юид
-    genshin_uid = request.data["genshin_uid"]
+def update_settings(request):
     user = request.user
-    user.genshin_uid = genshin_uid
-    user.save()
+    data = request.data
+    updated = False
 
-    return success_response(
-        heading="UID установлен",
-        message="Теперь он будет использоваться по умолчанию при покупках и выводах, но Вы все еще сможете"
-                " сменить его вручную",
-        data={},
-        code=status.HTTP_200_OK
-    )
+    genshin_uid = data.get("genshin_uid")
+    photo_url = data.get("photo_url")
+    first_name = data.get("first_name")
+    last_name = data.get("last_name")
+
+    if genshin_uid is not None and genshin_uid != "":
+        # Тут должна быть логика валидации genshin_uid
+        user.genshin_uid = genshin_uid
+        updated = True
+
+    if photo_url is not None and photo_url != "":
+        user.photo_url = photo_url
+        updated = True
+
+    if first_name is not None and first_name != "":
+        user.first_name = first_name
+        updated = True
+
+    if last_name is not None and last_name != "":
+        user.last_name = last_name
+        updated = True
+
+    # Проверяем, было ли изменено хотя бы одно поле
+    if updated:
+        try:
+            user.full_clean()
+            user.save()
+            return success_response(
+                heading="Настройки обновлены",
+                message="Ваши настройки были успешно обновлены.",
+                data={},
+                code=status.HTTP_200_OK
+            )
+        except ValidationError as e:
+            return error_response(
+                heading="Ошибка валидации",
+                message="Одно из полей содержит неверные данные.",
+                errors=e.message_dict,
+                code=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        return error_response(
+            heading="Нет изменений",
+            message="Не было получено данных для изменений.",
+            errors=["no_data"],
+            code=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @api_view(["GET"])

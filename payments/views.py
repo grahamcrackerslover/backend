@@ -20,7 +20,7 @@ def activate_bonus(user, bonus_code):
         return success_response(
             heading="Бонус код активирован!",
             message=f"Вы получили {bonus_code.amount} моры!" if bonus_code.promo_type == "money"
-                    else f"Вы получили предмет(ы) в инвентарь!",
+            else f"Вы получили предмет(ы) в инвентарь!",
             data={},
             code=status.HTTP_200_OK
         )
@@ -152,11 +152,11 @@ def add_balance(request):
             # у промика все равно спишется одно использование. Исправить можно будет
             # когда подключим платежку
         # else:
-            # Тк код берется из переменной, в которую он вносится после вызова verify_promo,
-            # то эта строчка не только бесполезная, она еще и может сломать что-нибудь,
-            # поэтому я ее закомментирую
+        # Тк код берется из переменной, в которую он вносится после вызова verify_promo,
+        # то эта строчка не только бесполезная, она еще и может сломать что-нибудь,
+        # поэтому я ее закомментирую
 
-            # return Response({"error": "Invalid or expired promo code"}, status=status.HTTP_400_BAD_REQUEST)
+        # return Response({"error": "Invalid or expired promo code"}, status=status.HTTP_400_BAD_REQUEST)
 
     # TODO: Подключить платежку
 
@@ -221,3 +221,21 @@ def shop_buy(request):
         request.user.save()
 
     return place_order(new_hitem, genshin_uid, False)
+
+
+@api_view(["GET"])
+def uid_details(request):
+    uid = request.query_params.get('uid')
+    # add validation and an api request
+    return success_response(
+        heading="",
+        message="",
+        data={
+            "details": {
+                "username": "grigory",
+                "photo_url": "https://enka.network/ui/UI_AvatarIcon_PlayerGirl.png",
+                "level": 42
+            }
+        },
+        code=status.HTTP_200_OK
+    )

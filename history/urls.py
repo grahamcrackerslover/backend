@@ -8,5 +8,5 @@ urlpatterns = [
     path(
         "personal/", views.user_history, name="history-personal"
     ),  # /api/history/personal/
-    path("sell/", views.sell_item, name="history-sell-item"),  # /api/history/sell/
+    path("sell/", views.sell_items, name="history-sell-item"),  # /api/history/sell/
 ]

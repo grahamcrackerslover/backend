@@ -12,4 +12,5 @@ urlpatterns = [
     path("inventory/", views.inventory, name="custom-user-inventory"),  # /api/user/inventory
     path("stats/<int:id>", views.stats_by_id, name="custom-user-stats-by-id"),  # /api/user/stats
     path("stats/", views.stats, name="custom-user-stats"),  # /api/user/stats
+    path("settings/", views.update_settings, name="custom-user-update-settings"),
 ]

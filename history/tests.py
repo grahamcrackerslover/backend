@@ -30,6 +30,6 @@ class TestHistory:
         client.force_authenticate(test_user)
 
         url = reverse("history-sell-item")
-        response = client.post(url, {"id": test_items_and_cases[0].id})
+        response = client.post(url, {"ids": [test_items_and_cases[0].id]})
 
         assert response.status_code == status.HTTP_200_OK

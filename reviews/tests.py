@@ -19,5 +19,5 @@ class TestReviews:
         client.force_authenticate(test_user)
 
         url = reverse("reviews-create-review")
-        response = client.post(url, {"text": "Test review text"})
+        response = client.post(url, {"text": "Test review text", "is_positive": True})
         assert response.status_code == status.HTTP_201_CREATED

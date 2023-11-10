@@ -39,7 +39,7 @@ def create_review(request):
             heading="Ошибка валидации",
             message=f"Кажется, у Вас не получилось оставить отзыв. Пожалуйста, проверьте, что Вы заполнили текст"
                     f" отзыва и указали оценку. Если ошибка продолжит появляться, обратитесь в поддержку",
-            errors=["invalid_review"],
+            errors=serializer.errors,
             code=status.HTTP_400_BAD_REQUEST
         )
 

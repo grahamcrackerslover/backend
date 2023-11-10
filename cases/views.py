@@ -1,6 +1,10 @@
 import logging
 import random
+import string
 
+from django.db import models
+from django.db.models import ExpressionWrapper, F
+from django.db.models.functions import Abs, Cast
 from django.utils import timezone
 # Create your views here.
 from rest_framework import status
@@ -134,4 +138,45 @@ def open_case(request, pk):
         data={
             "item": serialized_item.data
         }
+    )
+
+
+@api_view(["GET"])
+def get_similar_priced_cases(request):
+    case_id = request.query_params.get('id')
+    number_of_cases = request.query_params.get('n')
+
+    if not number_of_cases.isnumeric() or int(number_of_cases) <= 0:
+        return error_response(
+            heading="Неверный параметр",
+            message="Число кейсов должно быть натуральным",
+            errors=["invalid_number_of_cases"],
+            code=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        # Получаем цену для заданного случая
+        target_case = Case.objects.get(id=case_id)
+    except Case.DoesNotExist:
+        return error_response(
+            heading="Case Not Found",
+            message="A case with the provided ID does not exist.",
+            errors=["case_not_found"],
+            code=status.HTTP_404_NOT_FOUND
+        )
+
+        # Получаем N ближайших по цене случаев, исключая сам случай
+    similar_cases = Case.objects.annotate(
+        price_diff=ExpressionWrapper(
+            Abs(Cast(F('price'), models.IntegerField()) - target_case.price),
+            output_field=models.IntegerField())
+    ).exclude(id=target_case.id).order_by('price_diff')[:int(number_of_cases)]
+
+    # Формируем данные для ответа
+    similar_cases_data = CaseSerializer(similar_cases, many=True).data
+
+    return success_response(
+        heading="Similar Priced Cases",
+        message="Successfully retrieved cases similar in price.",
+        data=similar_cases_data,
+        code=status.HTTP_200_OK
     )
