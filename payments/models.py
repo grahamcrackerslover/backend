@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 import custom_user.models
 from cases.models import Item
+from custom_user.models import CustomUser
 from history.models import HistoryItem as HItem
 
 
@@ -81,3 +82,11 @@ class PromoCode(Code):
             return amount + amount * self.percentage / 100
 
         return False
+
+
+class Payment(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.SET_NULL, null=True)
+    amount = models.IntegerField()
+    owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
+    created = models.DateTimeField(auto_now_add=True)
+    currency = models.CharField(max_length=3)

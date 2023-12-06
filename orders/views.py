@@ -7,19 +7,11 @@ from rest_framework.permissions import IsAuthenticated
 
 from history.models import HistoryItem as HItem
 from misc.responses import error_response, success_response
+from payments.models import Payment
 from .models import Orders
 
 
-def place_order(item, genshin_uid, is_test_instance):
-    # Если ордер на этот предмет уже существует, возвращаем ошибку
-    if Orders.objects.filter(item=item, is_cancelled=False).exists():
-        return error_response(
-            heading="Предмет уже заказан",
-            message="К сожалению, Вы не можете повторно разместить заказ на вывод предмета, который уже заказан",
-            errors=["item_already_ordered"],
-            code=status.HTTP_400_BAD_REQUEST
-        )
-
+def place_order(item, genshin_uid, payment, is_test_instance):
     # Устанавливаем параметр is_ordered для предмета и сохраняем
     item.is_ordered = True
     item.save()
@@ -32,7 +24,7 @@ def place_order(item, genshin_uid, is_test_instance):
     return success_response(
         heading="Заказ создан",
         message=f"Вы успешно создали заказ на \"{item.item.name}\"!",
-        data={'id': order.id},
+        data={'order_id': order.id, 'payment_id': payment.id},
         code=status.HTTP_201_CREATED
     )
 
@@ -63,8 +55,23 @@ def create_order(request):
             code=status.HTTP_400_BAD_REQUEST
         )
 
+    if Orders.objects.filter(item=item, is_cancelled=False).exists():
+        return error_response(
+            heading="Предмет уже заказан",
+            message="К сожалению, Вы не можете повторно разместить заказ на вывод предмета, который уже заказан",
+            errors=["item_already_ordered"],
+            code=status.HTTP_400_BAD_REQUEST
+        )
+
+    payment = Payment.objects.create(
+        item=item,
+        amount=item.price,
+        owner=request.user,
+        currency='RUB'
+    )
+
     return place_order(
-        item, genshin_uid, request.data.get("is_test_instance", False)
+        item, genshin_uid, payment, request.data.get("is_test_instance", False)
     )
 
 
