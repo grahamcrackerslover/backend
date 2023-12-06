@@ -12,7 +12,8 @@ from cases.serializers import ItemSerializer
 from history.models import HistoryItem as HItem
 from misc.responses import success_response, error_response
 from orders.views import place_order
-from payments.models import BonusCode, PromoCode
+from payments.models import BonusCode, PromoCode, Payment
+from payments.serializers import PaymentSerializer
 
 
 def activate_bonus(user, bonus_code):
@@ -238,4 +239,23 @@ def uid_details(request):
             }
         },
         code=status.HTTP_200_OK
+    )
+
+
+@api_view(['GET'])
+def payment_detail(request, pk):
+    try:
+        payment = Payment.objects.get(pk=pk)
+    except Payment.DoesNotExist:
+        return error_response(
+            heading="",
+            message="",
+            errors=["payment_not_found"]
+        )
+
+    serializer = PaymentSerializer(payment)
+    return success_response(
+        heading="",
+        message="",
+        data={"payment": serializer.data}
     )
