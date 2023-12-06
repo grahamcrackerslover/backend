@@ -15,5 +15,5 @@ urlpatterns = [
     path('verify/<str:code>/', views.verify_promo, name='payments-verify-promo'), 
     path('buy/', views.shop_buy, name='payments-shop-buy'),
     path('uid_details/', views.uid_details, name='payments-uid-details'),
-    path('payments/<int:pk>/', views.payment_detail, name='payment-detail'),
+    path('details/<int:pk>/', views.payment_detail, name='payments-payment-detail'),
 ]
