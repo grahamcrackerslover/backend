@@ -11,7 +11,7 @@ from payments.models import Payment
 from .models import Orders
 
 
-def place_order(item, genshin_uid, payment, is_test_instance):
+def place_order(item, genshin_uid, payment=None, is_test_instance=False):
     # Устанавливаем параметр is_ordered для предмета и сохраняем
     item.is_ordered = True
     item.save()
@@ -24,7 +24,7 @@ def place_order(item, genshin_uid, payment, is_test_instance):
     return success_response(
         heading="Заказ создан",
         message=f"Вы успешно создали заказ на \"{item.item.name}\"!",
-        data={'order_id': order.id, 'payment_id': payment.id},
+        data={'order_id': order.id, 'payment_id': payment.id if payment else None},
         code=status.HTTP_201_CREATED
     )
 
@@ -63,15 +63,8 @@ def create_order(request):
             code=status.HTTP_400_BAD_REQUEST
         )
 
-    payment = Payment.objects.create(
-        item=item,
-        amount=item.price,
-        owner=request.user,
-        currency='RUB'
-    )
-
     return place_order(
-        item, genshin_uid, payment, request.data.get("is_test_instance", False)
+        item, genshin_uid, request.data.get("is_test_instance", False)
     )
 
 

@@ -221,7 +221,14 @@ def shop_buy(request):
         request.user.balance += item.cashback
         request.user.save()
 
-    return place_order(new_hitem, genshin_uid, False)
+    payment = Payment.objects.create(
+        item=item,
+        amount=item.price,
+        owner=request.user,
+        currency='RUB'
+    )
+
+    return place_order(new_hitem, genshin_uid, payment, False)
 
 
 @api_view(["GET"])
