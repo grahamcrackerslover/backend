@@ -73,8 +73,7 @@ class TestOrders:
             },
         )
         assert response_1.status_code == status.HTTP_201_CREATED
-
-        response_2 = client.post(url_2, {"id": response_1.data['data']['id']})
+        response_2 = client.post(url_2, {"id": response_1.data['data']['order_id']})
         assert response_2.status_code == status.HTTP_200_OK
 
     def test_cancel_order_doesnt_exist(self, client, test_user):
@@ -98,10 +97,10 @@ class TestOrders:
         )
         assert response.status_code == status.HTTP_201_CREATED
 
-        order = Orders.objects.get(id=response.data['data']['id'])
+        order = Orders.objects.get(id=response.data['data']['order_id'])
         order.step = "withdrawing"
         order.save()
 
         url_2 = reverse("orders-cancel-order")
-        response_2 = client.post(url_2, {"id": response.data['data']['id']})
+        response_2 = client.post(url_2, {"id": response.data['data']['order_id']})
         assert response_2.status_code == status.HTTP_400_BAD_REQUEST

@@ -25,6 +25,10 @@ from history.serializers import HistoryItemSerializer as HItemSerializer
 from misc.responses import error_response, success_response
 from .models import CustomUser
 from .serializers import UserSerializer, BasicUserSerializer
+import requests
+from PIL import Image
+from django.core.files.base import ContentFile
+from io import BytesIO
 
 
 def merge_accounts(first: CustomUser, second: CustomUser):
@@ -147,6 +151,16 @@ def telegram_auth(request):
             telegram_id=data["id"],
         )
 
+        if created and 'photo_url' in data:
+            response = requests.get(data['photo_url'])
+            img = Image.open(BytesIO(response.content))
+            img.thumbnail((200, 200))
+            img_io = BytesIO()
+            img.save(img_io, format='JPEG', quality=20)
+            filename = f'{user.id}_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.jpg'
+            user.photo.save(filename, ContentFile(img_io.getvalue()), save=True)
+
+
         user_ip = request.META.get("REMOTE_ADDR")  # Взять айпи юзера
         if created:
             if referrer:
@@ -171,7 +185,7 @@ def telegram_auth(request):
         # Сереализровать в жсон
         user_json = UserSerializer(user)
 
-        # Заменить код на 201 если создан, иначе 201
+        # Заменить код на 201 если создан, иначе 200
         response_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return success_response(
             heading="",
@@ -350,32 +364,19 @@ def inventory_by_id(request, id):
 
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
-def update_settings(request):
+def update_profile(request):
     user = request.user
     data = request.data
     updated = False
 
-    genshin_uid = data.get("genshin_uid")
-    photo_url = data.get("photo_url")
-    first_name = data.get("first_name")
-    last_name = data.get("last_name")
+    fields = ['genshin_uid', 'first_name', 'last_name']
+    updated = False
 
-    if genshin_uid is not None and genshin_uid != "":
-        # Тут должна быть логика валидации genshin_uid
-        user.genshin_uid = genshin_uid
-        updated = True
-
-    if photo_url is not None and photo_url != "":
-        user.photo_url = photo_url
-        updated = True
-
-    if first_name is not None and first_name != "":
-        user.first_name = first_name
-        updated = True
-
-    if last_name is not None and last_name != "":
-        user.last_name = last_name
-        updated = True
+    for field in fields:
+        value = data.get(field)
+        if value is not None and value != "":
+            setattr(user, field, value)
+            updated = True
 
     # Проверяем, было ли изменено хотя бы одно поле
     if updated:
@@ -395,6 +396,28 @@ def update_settings(request):
                 errors=e.message_dict,
                 code=status.HTTP_400_BAD_REQUEST
             )
+    else:
+        return error_response(
+            heading="Нет изменений",
+            message="Не было получено данных для изменений.",
+            errors=["no_data"],
+            code=status.HTTP_400_BAD_REQUEST
+        )
+        
+        
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def update_profile_picture(request):
+    if request.FILES.get('photo'):
+        user = request.user
+        user.photo = request.FILES['photo']
+        user.save()
+        return success_response(
+            heading="Фото обновлено",
+            message="Ваше фото было успешно обновлено.",
+            data={},
+            code=status.HTTP_200_OK
+        )
     else:
         return error_response(
             heading="Нет изменений",

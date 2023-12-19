@@ -15,8 +15,8 @@ class LotteryTicketSerializer(serializers.ModelSerializer):
 class GiveawayParticipantSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ("id", "first_name", "last_name", "photo_url")
-
+        fields = ("id", "first_name", "last_name", "photo")
+        
 
 class GiveawayItemSerializer(serializers.ModelSerializer):
     item = ItemSerializer(read_only=True)

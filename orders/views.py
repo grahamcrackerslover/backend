@@ -62,9 +62,17 @@ def create_order(request):
             errors=["item_already_ordered"],
             code=status.HTTP_400_BAD_REQUEST
         )
+        
+    # Create a payment model instance
+    payment = Payment.objects.create(
+        item=item.item,
+        amount=item.item.price,
+        owner=request.user,
+        currency='RUB'
+    )
 
     return place_order(
-        item, genshin_uid, request.data.get("is_test_instance", False)
+        item, genshin_uid, payment, request.data.get("is_test_instance", False)
     )
 
 

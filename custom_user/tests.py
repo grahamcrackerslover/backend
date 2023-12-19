@@ -90,7 +90,7 @@ class TestCustomUser:
     ):
         data = telegram_data()
         data["auth_date"] = 0
-        verification = checkTelegramAuthorization(data)
+        verification = checkTelegramAuthorization(data, True)
 
         assert verification is False
 
@@ -99,7 +99,7 @@ class TestCustomUser:
     ):
         data = telegram_data()
         data["hash"] = "fakehash"
-        verification = checkTelegramAuthorization(data)
+        verification = checkTelegramAuthorization(data, True)
 
         assert verification is False
 

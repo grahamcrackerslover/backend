@@ -32,9 +32,7 @@ class CustomUser(AbstractBaseUser):
     vk_id = models.PositiveBigIntegerField(unique=True, null=True, blank=True)
     vk_access_token = models.TextField(null=True, blank=True)
     genshin_uid = models.PositiveIntegerField(null=True, blank=True)
-    photo_url = models.TextField(
-        blank=True, null=True, default="https://vk.com/images/camera_100.png"
-    )
+    photo = models.ImageField(upload_to='photos/', default='photos/klee.jpeg', null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     is_banned = models.BooleanField(default=False)
     is_frozen = models.BooleanField(default=False)
