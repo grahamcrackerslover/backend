@@ -157,8 +157,7 @@ def telegram_auth(request):
             img.thumbnail((200, 200))
             img_io = BytesIO()
             img.save(img_io, format='JPEG', quality=20)
-            filename = f'{user.id}_{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.jpg'
-            user.photo.save(filename, ContentFile(img_io.getvalue()), save=True)
+            user.photo.save('', ContentFile(img_io.getvalue()), save=True)
 
 
         user_ip = request.META.get("REMOTE_ADDR")  # Взять айпи юзера
@@ -412,6 +411,7 @@ def update_profile_picture(request):
         user = request.user
         user.photo = request.FILES['photo']
         user.save()
+        
         return success_response(
             heading="Фото обновлено",
             message="Ваше фото было успешно обновлено.",

@@ -11,6 +11,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 import uuid
+import datetime
 
 
 class CustomUserManager(BaseUserManager):
@@ -19,6 +20,12 @@ class CustomUserManager(BaseUserManager):
         user.set_unusable_password()
         user.save()
         return user
+    
+    
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<timestamp>.jpg
+    return 'photos/user_{0}/{1}.jpg'.format(instance.id, datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+
 
 
 class CustomUser(AbstractBaseUser):
@@ -32,7 +39,7 @@ class CustomUser(AbstractBaseUser):
     vk_id = models.PositiveBigIntegerField(unique=True, null=True, blank=True)
     vk_access_token = models.TextField(null=True, blank=True)
     genshin_uid = models.PositiveIntegerField(null=True, blank=True)
-    photo = models.ImageField(upload_to='photos/', default='photos/klee.jpeg', null=True, blank=True)
+    photo = models.ImageField(upload_to=user_directory_path, default='photos/klee.jpeg', null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     is_banned = models.BooleanField(default=False)
     is_frozen = models.BooleanField(default=False)

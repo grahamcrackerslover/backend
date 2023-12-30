@@ -5,7 +5,7 @@ from custom_user.models import CustomUser
 
 
 class HistoryItem(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.SET_NULL, null=True)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, null=True)
     owner = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     is_sold = models.BooleanField(default=False)
     is_ordered = models.BooleanField(default=False)
@@ -16,7 +16,7 @@ class HistoryItem(models.Model):
 
 
 class HistoryCase(models.Model):
-    case = models.ForeignKey(Case, on_delete=models.SET_NULL, null=True)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, null=True)
     item = models.OneToOneField(HistoryItem, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     opened_at = models.DateTimeField(auto_now_add=True)

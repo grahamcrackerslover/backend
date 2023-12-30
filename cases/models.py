@@ -15,7 +15,7 @@ class Item(models.Model):
     type = models.CharField(choices=TYPE_CHOICES, max_length=10)
     crystals = models.BigIntegerField()
     price = models.IntegerField()
-    sgd_price = models.IntegerField(default=0)
+    sgd_price = models.FloatField(default=0)
     for_sale = models.BooleanField(default=True)
     cashback = models.IntegerField(null=True)
 
